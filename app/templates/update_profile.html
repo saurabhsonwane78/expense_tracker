@@ -1,0 +1,100 @@
+<!-- update_profile.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<style>
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Form container styling */
+.form-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 1.1);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+/* Heading styling */
+h2 {
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+/* Form label styling */
+.form-label {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: .5rem;
+    display: block;
+}
+
+/* Form input styling */
+.form-control {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: .75rem;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #ffce34;
+    border: none;
+    color: #000000;
+    padding: 0.75rem 1rem;
+    /* font-size: 1em; */
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+input, select{
+    width: 100%;
+    border: 1px solid grey;
+    padding: 1%;
+}
+</style>
+<div class="container mt-5 mb-4">
+    <h2 class="text-center mb-4">Edit Profile</h2>
+    <div class="form-container">
+        <form method="post" id="update-profile-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% for message in messages %}
+                <h5 class="text-center mt-2 mb-2" style="color: green;">{{message}}</h5>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary btn-block">Update</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#update-profile-form').on('submit', function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '',
+        data: $(this).serialize(),
+        success: function(response) {
+          if (response.status === 'success') {
+            location.reload()
+            // Optionally, you could redirect the user to another page
+          } else {
+            alert('Error updating profile');
+          }
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

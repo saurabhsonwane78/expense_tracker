@@ -1,0 +1,106 @@
+<!-- login.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<style>
+  /* General container styling */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Form container styling */
+.form-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 1.1);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+/* Heading styling */
+h2 {
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+/* Form field styling */
+form p {
+    margin-bottom: 1.5rem;
+}
+
+/* Input styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: .75rem;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #ffce34;
+    border: none;
+    color: #000000;
+    padding: 0.75rem 1rem;
+    /* font-size: 1em; */
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Full-width button */
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+</style>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Login</h2>
+    <div class="form-container">
+        <form method="post" id="login-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <h5 id="loginerror" style="text-align: center; color: red;"></h5>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#login-form').on('submit', function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '',
+        data: $(this).serialize(),
+        success: function(response) {
+          if (response.status === 'success') {
+            window.location.href = "/";  // Redirect to the homepage
+          } else {
+            document.getElementById('loginerror').innerHTML=response.message
+            // alert(response.message);
+          }
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

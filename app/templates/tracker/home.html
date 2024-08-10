@@ -1,0 +1,219 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<style>
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .table td,
+  .table th {
+    padding: 12px 15px;
+    border: 1px solid #bab9b9;
+    text-align: center;
+    font-size: 16px;
+  }
+  .table th {
+    background-color: #265C9A;
+    color: #ffffff;
+  }
+  
+  @media (max-width: 785px) {
+    .table thead {
+      display: none;
+    }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+  .table tr {
+    margin-bottom: 15px;
+  }
+  .table td {
+    padding-left: 50%;
+    text-align: left;
+    position: relative;
+  }
+  .table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-left: 15px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: left;
+  }
+  .container{
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+  .p-4 {
+      padding: 1.5rem 1rem !important;
+  }
+  .mt-5, .my-5 {
+      margin-top: 2rem !important;
+  }
+}
+
+</style>
+<div class="container mt-5" style="max-width: 1600px;">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" id="loans-given-tab" data-toggle="tab" href="#loans-given" role="tab" aria-controls="loans-given" aria-selected="true">Money Transferred</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="loans-received-tab" data-toggle="tab" href="#loans-received" role="tab" aria-controls="loans-received" aria-selected="false">Refunds</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="totaloutstanding-tab" data-toggle="tab" href="#totaloutstanding" role="tab" aria-controls="totaloutstanding" aria-selected="false">Total Outstanding</a>
+    </li>
+  </ul>
+  
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="loans-given" role="tabpanel" aria-labelledby="loans-given-tab">
+      <div class="border p-4 mt-4">
+        <h2 class="mb-4">Money Transferred</h2>
+        <table class="table vertical-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Location</th>
+              <th>Payment Mode</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="loans-given-list">
+            {% for loan in loans_given %}
+              <tr>
+                <td data-label="Date">{{ loan.created_on }}</td>
+                <td data-label="Name">{{ loan.borrower }}</td>
+                <td data-label="Description">{{ loan.description }}</td>
+                <td data-label="Category">{{ loan.category }}</td>
+                <td data-label="Location">{{ loan.location }}</td>
+                <td data-label="Payment Mode">{{ loan.payment_mode }}</td>
+                <td data-label="Amount">{{ loan.amount }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="tab-pane fade" id="loans-received" role="tabpanel" aria-labelledby="loans-received-tab">
+      <div class="border p-4 mt-4">
+        <h2 class="mb-4">Refunds</h2>
+        <table class="table vertical-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Transaction</th>
+              <th>Payment Mode</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="loans-received-list">
+            {% for loan in refunds %}
+              <tr>
+                <td data-label="Date">{{ loan.created_on }}</td>
+                <td data-label="Name">{{ loan.loan.borrower }}</td>
+                <td data-label="Transaction">{{ loan.loan }}</td>
+                <td data-label="Payment Mode">{{ loan.payment_mode }}</td>
+                <td data-label="Amount">{{ loan.amount }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="tab-pane fade" id="totaloutstanding" role="tabpanel" aria-labelledby="totaloutstanding-tab">
+      <div class="border p-4 mt-4">
+        <h2 class="mb-4">Outstanding</h2>
+        <table class="table vertical-table">
+          <thead>
+            <tr>
+              <th>Borrower</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="loans-received-list">
+            {% for obj in total_outstanding %}
+              <tr>
+                <td data-label="Borrower">{{ obj.borrower.username }}</td>
+                <td data-label="Amount">{{ obj.total_outstanding }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#loan-form').on('submit', function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '',
+        data: $(this).serialize(),
+        success: function(response) {
+          if (response.status === 'success') {
+            $('#loans-given-list').append(
+              '<tr><td data-label="Date">' + response.date + '</td><td data-label="Amount">' + response.amount + '</td><td data-label="Description">' + response.description + '</td><td data-label="Borrower">' + response.borrower + '</td></tr>'
+            );
+          } else {
+            alert(response.message);
+          }
+        }
+      });
+    });
+
+    $('#category-form').on('submit', function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '',
+        data: $(this).serialize(),
+        success: function(response) {
+          if (response.status === 'success') {
+            // Category added successfully
+          } else {
+            alert(response.message);
+          }
+        }
+      });
+    });
+
+    $('#user-form').on('submit', function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '',
+        data: $(this).serialize(),
+        success: function(response) {
+          if (response.status === 'success') {
+            $('#users-list').append('<tr><td>' + response.email + '</td></tr>');
+          } else {
+            alert(response.message);
+          }
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

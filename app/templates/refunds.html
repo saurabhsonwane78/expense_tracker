@@ -1,0 +1,106 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<style>
+  .form-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 1.1);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+/* Heading styling */
+h2 {
+    color: #333;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+/* Form label styling */
+.form-label {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: .5rem;
+    display: block;
+}
+
+/* Form input styling */
+.form-control {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #ffce34;
+    border: none;
+    color: #000000;
+    padding: 0.75rem 1rem;
+    /* font-size: 1em; */
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+input#id_name {
+    width: 100%;
+    border: 1px solid grey;
+    padding: 1%;
+}
+</style>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Add Refund</h2>
+    <div class="form-container">
+        <form id="refund-form" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="loan" class="form-label">Loan</label>
+                <select id="loan" name="loan" class="form-control">
+                    {% for loan in loans %}
+                        <option value="{{ loan.id }}">Loan For {{ loan.description }} - {{ loan.amount }} rs</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="amount" class="form-label">Amount</label>
+                <input type="number" id="amount" name="amount" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="payment_mode" class="form-label">Payment Mode</label>
+                <input type="text" id="payment_mode" name="payment_mode" class="form-control">
+            </div>
+            {% for message in messages %}
+                <h5 class="text-center mt-2 mb-2" style="color: green;">{{message}}</h5>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Add Refund</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#refund-form').on('submit', function(event) {
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '{% url "add-refund" %}',
+        data: $(this).serialize(),
+        success: function(response) {
+          if (response.status === 'success') {
+            location.reload();
+          } else {
+            alert(response.message);
+          }
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
